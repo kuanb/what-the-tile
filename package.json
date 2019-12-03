@@ -16,7 +16,8 @@
   "scripts": {
     "build": "browserify src/index.js -o static/bundle.js",
     "watch": "watchify src/index.js -o static/bundle.js",
-    "dev": "budo src/index.js --live --dir static"
+    "dev": "budo src/index.js --live --dir static",
+    "snapshot": "cp static/bundle.js docs/bundle.js && cp static/index.html docs/index.html"
   },
   "repository": {
     "type": "git",
