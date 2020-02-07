@@ -11,22 +11,23 @@
     "mapbox-gl": "^0.49.0"
   },
   "devDependencies": {
-    "budo": "^11.3.2"
+    "budo": "^11.3.2",
+    "gh-pages": "^2.2.0"
   },
   "scripts": {
     "build": "browserify src/index.js -o static/bundle.js",
     "watch": "watchify src/index.js -o static/bundle.js",
     "dev": "budo src/index.js --live --dir static",
-    "snapshot": "cp static/bundle.js docs/bundle.js && cp static/index.html docs/index.html"
+    "publish": "gh-pages -d static"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/benjamintd/what-the-tile.git"
+    "url": "git+https://github.com/kuanb/what-the-tile.git"
   },
-  "author": "benjamintd",
+  "author": "benjamintd, kuanb",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/benjamintd/what-the-tile/issues"
+    "url": "https://github.com/kuanb/what-the-tile/issues"
   },
-  "homepage": "https://github.com/benjamintd/what-the-tile#readme"
+  "homepage": "https://github.com/kuanb/what-the-tile#readme"
 }
