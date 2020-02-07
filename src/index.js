@@ -24,11 +24,10 @@ class QuadkeySearchControl {
         this._container = document.createElement('div');
         this._container.className = 'mapboxgl-ctrl';
         this._container.innerHTML = `
-          <div id='tilesearch'>
-            Quadkey search:
+          <form id='tilesearch' onsubmit="return false;" >
+            <div id='tag'>QK</div>
             <input id='editable'></input>
-            <button id='search'>Search</button>
-          </div>
+          </form>
         `;
         return this._container;
     }
@@ -160,13 +159,13 @@ function getExtentsGeom() {
 }
 
 // bind op to search button, top left
-document.getElementById('search').onclick = function navToQuadkey() {
-  const button = document.getElementById('search');
+document.getElementById('tilesearch').onsubmit = function navToQuadkey(e) {
+  e.preventDefault();
   try {
     // convert qk to a tile to leverage helper func
     const qkGeo = tilebelt.tileToGeoJSON(
       tilebelt.quadkeyToTile(
-        button.parentElement.firstElementChild.value.toString()));
+        document.getElementById('editable').value.toString()));
 
     // move map viewport around the new tile
     map.fitBounds(
