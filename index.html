@@ -12,24 +12,27 @@
         #map { position:absolute; top:0; bottom:0; width:100%; }
 
         #tilesearch {
-            padding: 10px 20px;
+            width: 240px;
+            height: 40px;
             background-color: #FFF;
-            min-width: 250px;
-            line-height: 18px;
-            overflow-y: hidden;
-            white-space: nowrap;
             border-radius: 3px;
-            border: 1px solid #CCC;
+            border: 2px solid #CCC;
+        }
+
+        #tilesearch #tag {
             color: #BBB;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 10px;
+            line-height: 20px;
+            display: inline-block;
         }
 
         #tilesearch #editable {
-            color: #000;
-        }
-
-        #tilesearch #search {
-            float: right;
-            font-weight: bold;
+            font-size: 12px;
+            overflow-y: hidden;
+            white-space: nowrap;
+            border: 0px solid;
         }
 
         #snackbar {
