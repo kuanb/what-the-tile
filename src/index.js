@@ -1,7 +1,7 @@
 const MapboxGeocoder = require('@mapbox/mapbox-gl-geocoder');
 const mapboxgl = require('mapbox-gl');
 const tilebelt = require('@mapbox/tilebelt');
-const tc = require('@mapbox/tile-cover');
+const cover = require('@mapbox/tile-cover');
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoia3VhbmIiLCJhIjoidXdWUVZ2USJ9.qNKXXP6z9_fKA8qrmpOi6Q';
 
@@ -125,7 +125,9 @@ function update() {
 function updateTiles() {
   var extentsGeom = getExtentsGeom();
   var zoom = Math.ceil(map.getZoom());
-  tiles = tc.tiles(extentsGeom, {min_zoom: zoom, max_zoom: zoom});
+  var qkQuery = getQuadKeyQueryString();
+  var targetZoom = qkQuery && qkQuery.length ? qkQuery.length : zoom;
+  tiles = cover.tiles(extentsGeom, {min_zoom: targetZoom, max_zoom: targetZoom});
 
   map.getSource('tiles-geojson').setData({
     type: 'FeatureCollection',
@@ -158,19 +160,25 @@ function getExtentsGeom() {
   };
 }
 
+function getQuadKeyQueryString() {
+  try {
+    return document.getElementById('editable').value.toString();
+  } catch (e) {
+    // TODO: handle edge case?
+    console.log(e);
+  }
+}
+
 // bind op to search button, top left
 document.getElementById('tilesearch').onsubmit = function navToQuadkey(e) {
   e.preventDefault();
   try {
     // convert qk to a tile to leverage helper func
     const qkGeo = tilebelt.tileToGeoJSON(
-      tilebelt.quadkeyToTile(
-        document.getElementById('editable').value.toString()));
+      tilebelt.quadkeyToTile(getQuadKeyQueryString()));
 
     // move map viewport around the new tile
-    map.fitBounds(
-      [qkGeo.coordinates[0][0], qkGeo.coordinates[0][2]],
-      {padding: {top: 200, bottom: 200, left: 200, right: 200}});
+    map.fitBounds([qkGeo.coordinates[0][0], qkGeo.coordinates[0][2]]);
 
   } catch (e) {
     // TODO: make a new version of snackbar that says "bad quadkey"
