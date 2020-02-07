@@ -3,11 +3,11 @@ const mapboxgl = require('mapbox-gl');
 const tilebelt = require('@mapbox/tilebelt');
 const tc = require('@mapbox/tile-cover');
 
-mapboxgl.accessToken = 'pk.eyJ1IjoiYmVuamFtaW50ZCIsImEiOiJjaW83enIwNjYwMnB1dmlsejN6cDBzbm93In0.0ZOGwSLp8OjW6vCaEKYFng';
+mapboxgl.accessToken = 'pk.eyJ1Ijoia3VhbmIiLCJhIjoidXdWUVZ2USJ9.qNKXXP6z9_fKA8qrmpOi6Q';
 
 var map = new mapboxgl.Map({
   container: 'map',
-  style: 'mapbox://styles/benjamintd/cjmt1av8w1dto2so7ijtr4b67',
+  style: 'mapbox://styles/mapbox/light-v10',
   center: [0, 25],
   zoom: 1.3
 });
