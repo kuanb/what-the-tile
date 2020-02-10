@@ -9425,9 +9425,7 @@ function update() {
 function updateTiles() {
   var extentsGeom = getExtentsGeom();
   var zoom = Math.ceil(map.getZoom());
-  var qkQuery = getQuadKeyQueryString();
-  var targetZoom = qkQuery && qkQuery.length ? qkQuery.length : zoom;
-  tiles = cover.tiles(extentsGeom, {min_zoom: targetZoom, max_zoom: targetZoom});
+  tiles = cover.tiles(extentsGeom, {min_zoom: zoom, max_zoom: zoom});
 
   map.getSource('tiles-geojson').setData({
     type: 'FeatureCollection',
@@ -9478,7 +9476,9 @@ document.getElementById('tilesearch').onsubmit = function navToQuadkey(e) {
       tilebelt.quadkeyToTile(getQuadKeyQueryString()));
 
     // move map viewport around the new tile
-    map.fitBounds([qkGeo.coordinates[0][0], qkGeo.coordinates[0][2]]);
+    map.fitBounds([
+      qkGeo.coordinates[0][0],
+      qkGeo.coordinates[0][2]]);
 
   } catch (e) {
     // TODO: make a new version of snackbar that says "bad quadkey"
