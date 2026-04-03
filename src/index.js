@@ -148,7 +148,7 @@ function getQuadKeyQueryString() {
 function navigateToQuadkey(qk) {
   var tile = tilebelt.quadkeyToTile(qk);
   var qkGeo = tilebelt.tileToGeoJSON(tile);
-  map.fitBounds([qkGeo.coordinates[0][0], qkGeo.coordinates[0][2]]);
+  map.fitBounds([qkGeo.coordinates[0][0], qkGeo.coordinates[0][2]], {animate: false});
   setQuadkeyHash(qk);
 }
 
