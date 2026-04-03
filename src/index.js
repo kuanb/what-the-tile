@@ -53,6 +53,21 @@ map.on('load', () => {
     }
   });
 
+  map.addSource('highlight-geojson', {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features: [] }
+  });
+
+  map.addLayer({
+    id: 'highlight',
+    source: 'highlight-geojson',
+    type: 'line',
+    paint: {
+      'line-color': '#e74c3c',
+      'line-width': 3
+    }
+  });
+
   map.addLayer({
     id: 'tiles-centers',
     source: 'tiles-centers-geojson',
@@ -81,6 +96,7 @@ map.on('click', (e) => {
   var qk = features[0].properties.quadkey;
   copyToClipboard(qk);
   setQuadkeyHash(qk);
+  highlightQuadkey(qk);
   showSnackbar();
 })
 
@@ -145,11 +161,21 @@ function getQuadKeyQueryString() {
   }
 }
 
+function highlightQuadkey(qk) {
+  var tile = tilebelt.quadkeyToTile(qk);
+  var geo = tilebelt.tileToGeoJSON(tile);
+  map.getSource('highlight-geojson').setData({
+    type: 'FeatureCollection',
+    features: [{ type: 'Feature', properties: {}, geometry: geo }]
+  });
+}
+
 function navigateToQuadkey(qk) {
   var tile = tilebelt.quadkeyToTile(qk);
   var qkGeo = tilebelt.tileToGeoJSON(tile);
   map.fitBounds([qkGeo.coordinates[0][0], qkGeo.coordinates[0][2]], {animate: false});
   setQuadkeyHash(qk);
+  highlightQuadkey(qk);
 }
 
 function setQuadkeyHash(qk) {
