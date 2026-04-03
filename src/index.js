@@ -16,31 +16,7 @@ var geocoder = new MapboxGeocoder({
   accessToken: mapboxgl.accessToken
 });
 
-map.addControl(geocoder);
-
-class QuadkeySearchControl {
-    onAdd(map) {
-        this._map = map;
-        this._container = document.createElement('div');
-        this._container.className = 'mapboxgl-ctrl';
-        this._container.innerHTML = `
-          <form id='tilesearch' onsubmit="return false;" >
-            <div id='tag'>QK</div>
-            <input id='editable'></input>
-          </form>
-        `;
-        return this._container;
-    }
-
-    onRemove() {
-        this._container.parentNode.removeChild(this._container);
-        this._map = undefined;
-    }
-}
-
-var quadkeySearchControl = new QuadkeySearchControl();
-
-map.addControl(quadkeySearchControl, 'top-left');
+document.getElementById('geocoder-container').appendChild(geocoder.onAdd(map));
 
 map.on('load', () => {
   map.addSource('tiles-geojson', {
