@@ -54,6 +54,20 @@
             height: 100%;
             width: 160px;
         }
+        #tilesearch-go {
+            height: 100%;
+            border: none;
+            background: #3498db;
+            color: #fff;
+            font-weight: bold;
+            font-size: 13px;
+            padding: 0 14px;
+            cursor: pointer;
+            border-radius: 0 4px 4px 0;
+        }
+        #tilesearch-go:hover {
+            background: #2980b9;
+        }
         #geocoder-container .mapboxgl-ctrl-geocoder {
             min-width: 240px;
             width: 100%;
@@ -102,6 +116,7 @@
     <form id='tilesearch' onsubmit="return false;">
         <div id='tag'>QK</div>
         <input id='editable' placeholder='Enter quadkey...' />
+        <button id='tilesearch-go' type='submit'>Go</button>
     </form>
     <div id='geocoder-container'></div>
 </div>
