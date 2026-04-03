@@ -78,8 +78,10 @@ map.on('moveend', update);
 
 map.on('click', (e) => {
   features = map.queryRenderedFeatures(e.point, {layers: ['tiles-shade']});
-  copyToClipboard(features[0].properties.quadkey)
-  showSnackbar()
+  var qk = features[0].properties.quadkey;
+  copyToClipboard(qk);
+  setQuadkeyHash(qk);
+  showSnackbar();
 })
 
 function updateGeocoderProximity() {
@@ -143,21 +145,40 @@ function getQuadKeyQueryString() {
   }
 }
 
+function navigateToQuadkey(qk) {
+  var tile = tilebelt.quadkeyToTile(qk);
+  var qkGeo = tilebelt.tileToGeoJSON(tile);
+  map.fitBounds([qkGeo.coordinates[0][0], qkGeo.coordinates[0][2]]);
+  setQuadkeyHash(qk);
+}
+
+function setQuadkeyHash(qk) {
+  history.replaceState(null, '', '#qk=' + qk);
+  document.getElementById('editable').value = qk;
+}
+
+function getQuadkeyFromHash() {
+  var hash = window.location.hash;
+  if (hash && hash.indexOf('#qk=') === 0) {
+    return hash.slice(4);
+  }
+  return null;
+}
+
+// navigate to quadkey from URL hash on load
+map.on('load', function() {
+  var qk = getQuadkeyFromHash();
+  if (qk) {
+    try { navigateToQuadkey(qk); } catch (e) { console.log(e); }
+  }
+});
+
 // bind op to search button, top left
 document.getElementById('tilesearch').onsubmit = function navToQuadkey(e) {
   e.preventDefault();
   try {
-    // convert qk to a tile to leverage helper func
-    const qkGeo = tilebelt.tileToGeoJSON(
-      tilebelt.quadkeyToTile(getQuadKeyQueryString()));
-
-    // move map viewport around the new tile
-    map.fitBounds([
-      qkGeo.coordinates[0][0],
-      qkGeo.coordinates[0][2]]);
-
+    navigateToQuadkey(getQuadKeyQueryString());
   } catch (e) {
-    // TODO: make a new version of snackbar that says "bad quadkey"
     console.log(e);
   }
 };
