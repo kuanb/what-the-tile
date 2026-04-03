@@ -9316,31 +9316,7 @@ var geocoder = new MapboxGeocoder({
   accessToken: mapboxgl.accessToken
 });
 
-map.addControl(geocoder);
-
-class QuadkeySearchControl {
-    onAdd(map) {
-        this._map = map;
-        this._container = document.createElement('div');
-        this._container.className = 'mapboxgl-ctrl';
-        this._container.innerHTML = `
-          <form id='tilesearch' onsubmit="return false;" >
-            <div id='tag'>QK</div>
-            <input id='editable'></input>
-          </form>
-        `;
-        return this._container;
-    }
-
-    onRemove() {
-        this._container.parentNode.removeChild(this._container);
-        this._map = undefined;
-    }
-}
-
-var quadkeySearchControl = new QuadkeySearchControl();
-
-map.addControl(quadkeySearchControl, 'top-left');
+document.getElementById('geocoder-container').appendChild(geocoder.onAdd(map));
 
 map.on('load', () => {
   map.addSource('tiles-geojson', {
@@ -9377,6 +9353,21 @@ map.on('load', () => {
     }
   });
 
+  map.addSource('highlight-geojson', {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features: [] }
+  });
+
+  map.addLayer({
+    id: 'highlight',
+    source: 'highlight-geojson',
+    type: 'line',
+    paint: {
+      'line-color': '#e74c3c',
+      'line-width': 3
+    }
+  });
+
   map.addLayer({
     id: 'tiles-centers',
     source: 'tiles-centers-geojson',
@@ -9402,8 +9393,11 @@ map.on('moveend', update);
 
 map.on('click', (e) => {
   features = map.queryRenderedFeatures(e.point, {layers: ['tiles-shade']});
-  copyToClipboard(features[0].properties.quadkey)
-  showSnackbar()
+  var qk = features[0].properties.quadkey;
+  copyToClipboard(qk);
+  setQuadkeyHash(qk);
+  highlightQuadkey(qk);
+  showSnackbar();
 })
 
 function updateGeocoderProximity() {
@@ -9467,21 +9461,50 @@ function getQuadKeyQueryString() {
   }
 }
 
+function highlightQuadkey(qk) {
+  var tile = tilebelt.quadkeyToTile(qk);
+  var geo = tilebelt.tileToGeoJSON(tile);
+  map.getSource('highlight-geojson').setData({
+    type: 'FeatureCollection',
+    features: [{ type: 'Feature', properties: {}, geometry: geo }]
+  });
+}
+
+function navigateToQuadkey(qk) {
+  var tile = tilebelt.quadkeyToTile(qk);
+  var qkGeo = tilebelt.tileToGeoJSON(tile);
+  map.fitBounds([qkGeo.coordinates[0][0], qkGeo.coordinates[0][2]], {animate: false});
+  setQuadkeyHash(qk);
+  highlightQuadkey(qk);
+}
+
+function setQuadkeyHash(qk) {
+  history.replaceState(null, '', '#qk=' + qk);
+  document.getElementById('editable').value = qk;
+}
+
+function getQuadkeyFromHash() {
+  var hash = window.location.hash;
+  if (hash && hash.indexOf('#qk=') === 0) {
+    return hash.slice(4);
+  }
+  return null;
+}
+
+// navigate to quadkey from URL hash on load
+map.on('load', function() {
+  var qk = getQuadkeyFromHash();
+  if (qk) {
+    try { navigateToQuadkey(qk); } catch (e) { console.log(e); }
+  }
+});
+
 // bind op to search button, top left
 document.getElementById('tilesearch').onsubmit = function navToQuadkey(e) {
   e.preventDefault();
   try {
-    // convert qk to a tile to leverage helper func
-    const qkGeo = tilebelt.tileToGeoJSON(
-      tilebelt.quadkeyToTile(getQuadKeyQueryString()));
-
-    // move map viewport around the new tile
-    map.fitBounds([
-      qkGeo.coordinates[0][0],
-      qkGeo.coordinates[0][2]]);
-
+    navigateToQuadkey(getQuadKeyQueryString());
   } catch (e) {
-    // TODO: make a new version of snackbar that says "bad quadkey"
     console.log(e);
   }
 };
